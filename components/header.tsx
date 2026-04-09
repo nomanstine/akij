@@ -1,4 +1,5 @@
 import { ChevronDown, UserCircle2 } from "lucide-react";
+import Link from "next/link";
 
 interface User {
   name: string;
@@ -15,7 +16,8 @@ interface UserDropdownProps {
 }
 
 const navItems = [
-  { label: "Dashboard" }
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Exam", href: "/exam" }
 ];
 
 
@@ -33,9 +35,9 @@ function Navbar() {
     <nav className="flex items-center gap-8 lg:gap-12">
       <Logo />
       {navItems.map((item) => (
-        <span key={item.label} className="text-sm font-normal text-slate-800">
+        <Link key={item.label} href={item.href} className="text-sm font-normal text-slate-800 hover:text-slate-600 transition-colors">
           {item.label}
-        </span>
+        </Link>
       ))}
     </nav>
   );

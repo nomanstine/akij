@@ -36,7 +36,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="h-full flex flex-col">
-        <Header isAuthenticated={false} user={{ name: "Arif Hossain", refId: "16101121" }} />
+        <Header isAuthenticated={true} user={{ name: "Arif Hossain", refId: "16101121" }} />
         <main className="flex-1">
           {children}
         </main>

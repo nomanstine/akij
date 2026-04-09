@@ -24,8 +24,7 @@ const navItems = [
 
 function Navbar() {
   return (
-    <nav className="flex items-center gap-8 lg:gap-12">
-      <Logo />
+    <nav className="flex w-full gap-8 px-16 lg:gap-12">
       {navItems.map((item) => (
         <Link key={item.label} href={item.href} className="text-sm font-normal text-slate-800 hover:text-slate-600 transition-colors">
           {item.label}
@@ -55,10 +54,21 @@ function UserDropdown({ user }: UserDropdownProps) {
 export function Header({ isAuthenticated, user }: HeaderProps) {
   return (
     <header className="border-b border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
-      <div className="mx-auto flex h-20 w-full max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Navbar />
-
-        {isAuthenticated && user && <UserDropdown user={user} />}
+      <div className="mx-auto flex h-20 w-full max-w-[1280px] items-center px-4 sm:px-6 lg:px-8">
+        {isAuthenticated ? (
+          <div className="flex w-full items-center justify-between">
+            <Logo />
+            <div className="flex-1 flex justify-center">
+              <Navbar />
+            </div>
+            {user && <UserDropdown user={user} />}
+          </div>
+        ) : (
+          <div className="flex w-full items-center">
+            <Logo />
+            <div className="flex-1 text-center text-3xl font-bold text-slate-800">Akij Resource</div>
+          </div>
+        )}
       </div>
     </header>
   );

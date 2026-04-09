@@ -1,5 +1,6 @@
 import { ChevronDown, UserCircle2 } from "lucide-react";
 import Link from "next/link";
+import { Logo } from "./logo";
 
 interface User {
   name: string;
@@ -20,15 +21,6 @@ const navItems = [
   { label: "Exam", href: "/exam" }
 ];
 
-
-function Logo() {
-  return (
-    <div className="flex items-end gap-1 leading-none">
-      <span className="text-[30px] font-bold tracking-tight text-[#2F308C]">AKIJ</span>
-      <span className="pb-1 text-sm font-semibold tracking-wide text-slate-900">RESOURCE</span>
-    </div>
-  );
-}
 
 function Navbar() {
   return (

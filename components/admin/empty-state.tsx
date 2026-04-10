@@ -4,9 +4,9 @@ import React from 'react';
 
 const EmptyState: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg bg-white p-5 gap-5 w-full max-w-[1280px] mx-auto">
+    <div className="flex flex-col items-center justify-center rounded-lg bg-white p-5 gap-5 w-full max-w-2xl mx-auto">
       {/* Icon placeholder - you can replace with actual SVG */}
-      <div className="w-[120px] h-[120px] relative">
+      <div className="w-28 h-28 relative">
         {/* This would be the illustration from the CSS */}
         <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
           <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,10 +16,10 @@ const EmptyState: React.FC = () => {
       </div>
 
       <div className="flex flex-col items-center gap-3 text-center">
-        <h2 className="text-[20px] font-semibold text-slate-700 leading-[140%]">
+        <h2 className="text-xl font-semibold text-slate-700 leading-relaxed">
           No Tests Available
         </h2>
-        <p className="text-[14px] text-slate-500 leading-[140%] max-w-[539px]">
+        <p className="text-sm text-slate-500 leading-relaxed max-w-md">
           There are no online tests created yet. Create your first test to get started with managing examinations.
         </p>
       </div>

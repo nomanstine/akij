@@ -81,10 +81,10 @@ export default function CreateTestPage() {
           <div className="mt-6 flex items-center space-x-4">
             <button
               onClick={() => setCurrentStep('basic')}
-              className={`flex items-center space-x-2 ${currentStep === 'basic' ? 'text-[#6633FF]' : 'text-gray-500'}`}
+              className={`flex items-center space-x-2 ${currentStep === 'basic' ? 'text-violet-600' : 'text-gray-500'}`}
             >
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
-                currentStep === 'basic' ? 'bg-[#6633FF] text-white' : 'bg-gray-300 text-white'
+                currentStep === 'basic' ? 'bg-violet-600 text-white' : 'bg-gray-300 text-white'
               }`}>
                 1
               </div>
@@ -93,10 +93,10 @@ export default function CreateTestPage() {
             <div className="w-20 h-px bg-gray-400"></div>
             <button
               onClick={() => setCurrentStep('questions')}
-              className={`flex items-center space-x-2 ${currentStep === 'questions' ? 'text-[#6633FF]' : 'text-gray-500'}`}
+              className={`flex items-center space-x-2 ${currentStep === 'questions' ? 'text-violet-600' : 'text-gray-500'}`}
             >
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
-                currentStep === 'questions' ? 'bg-[#6633FF] text-white' : 'bg-gray-300 text-white'
+                currentStep === 'questions' ? 'bg-violet-600 text-white' : 'bg-gray-300 text-white'
               }`}>
                 2
               </div>
@@ -119,7 +119,7 @@ export default function CreateTestPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="Enter test name"
                   />
                 </div>
@@ -130,7 +130,7 @@ export default function CreateTestPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="Enter description"
                   />
                 </div>
@@ -145,7 +145,7 @@ export default function CreateTestPage() {
                   <div className="relative">
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Select category"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -163,7 +163,7 @@ export default function CreateTestPage() {
                   <div className="relative">
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Enter duration"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -184,7 +184,7 @@ export default function CreateTestPage() {
                   <div className="relative">
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Select start time"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -202,7 +202,7 @@ export default function CreateTestPage() {
                   <div className="relative">
                     <input
                       type="text"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Select end time"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -222,7 +222,7 @@ export default function CreateTestPage() {
                   </label>
                   <input
                     type="number"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="Enter total questions"
                   />
                 </div>
@@ -238,7 +238,7 @@ export default function CreateTestPage() {
                 <h2 className="text-xl font-semibold text-gray-900">Questions Sets</h2>
                 <Button
                   onClick={handleAddQuestion}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300"
                 >
                   Add Question
                 </Button>
@@ -261,7 +261,7 @@ export default function CreateTestPage() {
             {/* Save Button */}
             <Card className="p-6">
               <div className="flex justify-center">
-                <Button className="w-full max-w-md h-14 bg-[#6633FF] hover:bg-[#6633FF]/90 text-white font-semibold text-lg">
+                <Button className="w-full max-w-md h-14 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-lg">
                   Save
                 </Button>
               </div>
@@ -279,7 +279,7 @@ export default function CreateTestPage() {
               <Button
                 onClick={() => setCurrentStep('questions')}
                 size="lg"
-                className="w-48 h-10 bg-[#6633FF] hover:bg-[#6633FF]/90 text-white font-semibold"
+                className="w-48 h-10 bg-violet-600 hover:bg-violet-700 text-white font-semibold"
               >
                 Save & Continue
               </Button>

@@ -22,7 +22,7 @@ const AdminDashboard: React.FC = () => {
   }));
 
   return (
-    <main className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-5 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="container mx-auto flex flex-1 flex-col gap-5 px-4 py-10 sm:px-6 lg:px-8">
       <SearchFilter />
 
       {testData.length === 0 ? (

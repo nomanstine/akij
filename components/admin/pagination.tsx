@@ -33,12 +33,12 @@ const Pagination: React.FC = () => {
           aria-label="Previous page"
           onClick={handlePrev}
           disabled={page <= 1}
-          className="grid size-8 place-items-center rounded-lg border border-[#F1F2F4] bg-white text-slate-400 disabled:opacity-50"
+          className="grid size-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-400 disabled:opacity-50"
         >
           <ChevronLeft className="size-4" />
         </button>
 
-        <div className="grid size-8 place-items-center rounded-[10px] bg-[#F8F8F8] text-xs font-semibold text-[#2E2E2F]">
+        <div className="grid size-8 place-items-center rounded-xl bg-slate-100 px-3 text-xs font-semibold text-slate-800">
           {page}
         </div>
 
@@ -46,18 +46,18 @@ const Pagination: React.FC = () => {
           type="button"
           aria-label="Next page"
           onClick={handleNext}
-          className="grid size-8 place-items-center rounded-lg border border-[#F1F2F4] bg-white text-slate-800"
+          className="grid size-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-800"
         >
           <ChevronRight className="size-4" />
         </button>
       </div>
 
       <div className="flex items-center gap-4 self-end sm:self-auto">
-        <span className="text-xs font-medium text-[#666666]">Online Test Per Page</span>
+        <span className="text-xs font-medium text-slate-500">Online Test Per Page</span>
         <button
           type="button"
           onClick={handleLimitChange}
-          className="flex h-8 items-center gap-1 rounded-lg border border-[#F1F2F4] bg-white px-3 text-xs font-medium text-[#2E2E2F]"
+          className="flex h-8 items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-800"
         >
           {limit}
           <ChevronUp className="size-3.5" />

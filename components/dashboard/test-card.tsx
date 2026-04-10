@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CircleX, Clock3, FileText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,10 @@ interface TestCardProps {
   negativeMarking: string;
 }
 
-export function TestCard({ title, duration, questionCount, negativeMarking }: TestCardProps) {
+export function TestCard({ id, title, duration, questionCount, negativeMarking }: TestCardProps) {
   return (
-    <Card className="gap-0 rounded-2xl border border-[#E5E7EB] bg-white px-6 py-6 text-slate-700 shadow-none">
-      <h2 className="text-xl leading-[140%] font-semibold text-slate-700">
+    <Card className="gap-0 rounded-2xl border border-slate-200 bg-white px-6 py-6 text-slate-700 shadow-none">
+      <h2 className="text-xl leading-relaxed font-semibold text-slate-700">
         {title}
       </h2>
 
@@ -40,10 +41,11 @@ export function TestCard({ title, duration, questionCount, negativeMarking }: Te
 
       <div className="mt-6">
         <Button
+          asChild
           variant="outline"
-          className="h-10 min-w-[108px] rounded-xl border-[#6633FF] px-8 text-sm font-semibold text-[#6633FF] hover:bg-[#6633FF]/5"
+          className="h-11 w-[20%] rounded-xl border-violet-600 px-6 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
         >
-          Start
+          <Link href={`/exam?testId=${id}`}>Start</Link>
         </Button>
       </div>
     </Card>

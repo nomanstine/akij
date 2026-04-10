@@ -24,7 +24,7 @@ export const NavigationButtons: React.FC<NavigationButtonsProps> = ({
       <Button
         variant="outline"
         onClick={onSkip}
-        className="w-[180px] h-12 px-8 py-3 border-gray-300 rounded-xl font-semibold"
+        className="w-44 h-12 px-8 py-3 border-gray-300 rounded-xl font-semibold"
       >
         Skip this question
       </Button>
@@ -33,14 +33,14 @@ export const NavigationButtons: React.FC<NavigationButtonsProps> = ({
         {!isLastQuestion ? (
           <Button
             onClick={onSaveContinue}
-            className="w-[180px] h-12 px-8 py-3 bg-[#6633FF] hover:bg-[#6633FF]/90 rounded-xl text-white font-semibold"
+            className="button-primary font-bold"
           >
             Save & Continue
           </Button>
         ) : (
           <Button
             onClick={onSubmit}
-            className="w-[180px] h-12 px-8 py-3 bg-[#6633FF] hover:bg-[#6633FF]/90 rounded-xl text-white font-semibold"
+            className="button-primary font-bold"
           >
             Submit
           </Button>

@@ -99,13 +99,13 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
         <div className="flex justify-between items-center">
           <button
             onClick={() => onEdit(question.id)}
-            className="text-[#6633FF] hover:text-[#6633FF]/80 font-medium text-base"
+            className="text-violet-600 hover:text-violet-500 font-medium text-base"
           >
             Edit
           </button>
           <button
             onClick={() => onRemove(question.id)}
-            className="text-[#EA5055] hover:text-[#EA5055]/80 font-medium text-base"
+            className="text-red-600 hover:text-red-500 font-medium text-base"
           >
             Remove From Exam
           </button>

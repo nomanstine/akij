@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
@@ -37,52 +38,63 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-md p-8 bg-white border border-[#E5E7EB] rounded-lg shadow-none">
-    <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-[#334155] text-center">
+    <div className="auth-container flex flex-col gap-6 px-4 py-12">
+      {/* Sign In Heading */}
+      <h1 className="auth-heading">
         Sign In
-        </h1>
+      </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-[#334155]">
-            Email
+      {/* Form Container */}
+      <Card className="auth-card flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="form-stack">
+          {/* Email Input Field */}
+          <div className="form-field">
+            <Label htmlFor="email" className="form-label">
+              Email
             </Label>
             <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            className="w-full px-3 py-2 border border-[#D1D5DB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
-            required
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="form-input focus:border-transparent focus:ring-2 focus:ring-[var(--primary)]"
+              required
             />
-        </div>
+          </div>
 
-        <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium text-[#334155]">
-            Password
+          {/* Password Input Field */}
+          <div className="form-field">
+            <Label htmlFor="password" className="form-label">
+              Password
             </Label>
             <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            className="w-full px-3 py-2 border border-[#D1D5DB] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6633FF] focus:border-transparent"
-            required
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="form-input focus:border-transparent focus:ring-2 focus:ring-[var(--primary)]"
+              required
             />
-        </div>
+          </div>
 
-        <Button
+          <div className="flex justify-end">
+            <Link href="/forgot-password" className="form-help-link">
+              Forget Password?
+            </Link>
+          </div>
+
+          {/* Submit Button */}
+          <Button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#6633FF] hover:bg-[#5a2fd6] text-white py-3 rounded-lg font-semibold"
-        >
+            className="button-primary font-bold"
+          >
             {isLoading ? 'Signing In...' : 'Sign In'}
-        </Button>
+          </Button>
         </form>
+      </Card>
     </div>
-    </Card>
   );
 };

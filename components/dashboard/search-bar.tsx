@@ -21,7 +21,7 @@ export function SearchBar() {
   };
 
   return (
-    <div className="flex h-12 w-full items-center justify-between rounded-lg border border-[#E5E7EB] bg-white px-3 shadow-[2px_2px_6px_rgba(73,123,241,0.24)] md:max-w-[620px]">
+    <div className="flex h-12 w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 shadow-sm md:max-w-2xl">
       <input
         type="text"
         placeholder="Search by exam title"
@@ -32,7 +32,7 @@ export function SearchBar() {
       <button
         type="button"
         aria-label="Search exam"
-        className="grid size-8 place-items-center rounded-full bg-[#673FED1A] text-[#6633FF]"
+        className="grid size-8 place-items-center rounded-full bg-violet-100 text-violet-600"
       >
         <Search className="size-4" strokeWidth={2} />
       </button>

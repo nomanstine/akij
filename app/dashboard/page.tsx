@@ -3,9 +3,9 @@ import {tests} from "@/mockdata/data";
 
 export default function DashboardPage() {
 	return (
-		<main className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-5 px-4 py-10 sm:px-6 lg:px-8">
+		<main className="container mx-auto flex flex-1 flex-col gap-5 px-4 py-10 sm:px-6 lg:px-8">
 			<div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-				<h1 className="text-[24px] leading-[130%] font-semibold text-slate-700">Online Tests</h1>
+				<h1 className="text-2xl font-semibold text-slate-700">Online Tests</h1>
 				<SearchBar />
 			</div>
 

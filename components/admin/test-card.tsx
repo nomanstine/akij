@@ -14,8 +14,8 @@ interface TestCardProps {
 
 const TestCard: React.FC<TestCardProps> = ({ title, candidates, questionSets, examSlots }) => {
   return (
-    <Card className="gap-0 rounded-2xl border border-[#E5E7EB] bg-white px-6 py-6 text-slate-700 shadow-none">
-      <h2 className="text-xl leading-[140%] font-semibold text-slate-700">
+    <Card className="gap-0 rounded-2xl border border-slate-200 bg-white px-6 py-6 text-slate-700 shadow-none">
+      <h2 className="text-xl leading-relaxed font-semibold text-slate-700">
         {title}
       </h2>
 
@@ -42,13 +42,13 @@ const TestCard: React.FC<TestCardProps> = ({ title, candidates, questionSets, ex
       <div className="mt-6 flex gap-3">
         <Button
           variant="outline"
-          className="h-10 min-w-[108px] rounded-xl border-[#6633FF] px-8 text-sm font-semibold text-[#6633FF] hover:bg-[#6633FF]/5"
+          className="h-10 w-28 rounded-xl border-violet-600 px-8 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
         >
           View Details
         </Button>
         <Button
           variant="outline"
-          className="h-10 min-w-[108px] rounded-xl border-[#6633FF] px-8 text-sm font-semibold text-[#6633FF] hover:bg-[#6633FF]/5"
+          className="h-10 w-28 rounded-xl border-violet-600 px-8 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
         >
           Edit
         </Button>

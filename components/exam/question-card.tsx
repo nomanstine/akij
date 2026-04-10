@@ -72,7 +72,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   <button className="p-1 hover:bg-gray-200 rounded underline">U</button>
                 </div>
                 <textarea
-                  className="w-full p-4 min-h-[200px] border-0 resize-none focus:outline-none"
+                  className="w-full p-4 min-h-52 border-0 resize-none focus:outline-none"
                   placeholder="Type your answer here..."
                   value={richTextAnswer}
                   onChange={(e) => handleRichTextChange(e.target.value)}

@@ -7,8 +7,8 @@ import { Search } from 'lucide-react';
 const SearchFilter: React.FC = () => {
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <h1 className="text-[24px] leading-[130%] font-semibold text-slate-700">Online Tests</h1>
-      <div className="flex h-12 w-full items-center justify-between rounded-lg border border-[#E5E7EB] bg-white px-3 shadow-[2px_2px_6px_rgba(73,123,241,0.24)] md:max-w-[620px] mx-auto">
+      <h1 className="text-2xl leading-tight font-semibold text-slate-700">Online Tests</h1>
+      <div className="flex h-12 w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 shadow-sm md:max-w-2xl mx-auto">
         <input
           type="text"
           placeholder="Search by exam title"
@@ -17,12 +17,12 @@ const SearchFilter: React.FC = () => {
         <button
           type="button"
           aria-label="Search exam"
-          className="grid size-8 place-items-center rounded-full bg-[#673FED1A] text-[#6633FF]"
+          className="grid size-8 place-items-center rounded-full bg-violet-100 text-violet-600"
         >
           <Search className="size-4" strokeWidth={2} />
         </button>
       </div>
-      <Button className="h-12 min-w-[192px] rounded-xl bg-[#6633FF] px-8 text-sm font-semibold text-white hover:bg-[#6633FF]/90 md:self-end">
+      <Button className="h-12 w-48 rounded-xl bg-violet-600 px-8 text-sm font-semibold text-white hover:bg-violet-700 md:self-end">
         Create New Test
       </Button>
     </div>

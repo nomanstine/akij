@@ -3,8 +3,8 @@ import { Logo } from "./logo";
 
 export function Footer() {
   return (
-    <footer className="bg-[#130B2C]">
-      <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-4 px-4 py-6 text-white sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+    <footer className="bg-slate-950">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 text-white sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex items-center gap-2">
           <span className="text-lg font-normal">Powered by</span>
               <Logo variant="white"/>

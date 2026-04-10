@@ -1,50 +1,158 @@
-export const tests = [
+export interface Question {
+  id: string;
+  text: string;
+  type?: 'multiple-choice' | 'rich-text';
+  options?: { id: string; text: string }[];
+}
+
+export interface Test {
+  id: number;
+  title: string;
+  duration: string;
+  questionCount: number;
+  negativeMarking: string;
+  candidates: string;
+  questionSets: string;
+  examSlots: string;
+  questionTypes: string[];
+  questions: Question[];
+}
+
+export const tests: Test[] = [
 	{
 		id: 1,
 		title: "Psychometric Test for Management Trainee Officer",
-		duration: "30 min",
-		questionCount: 20,
+		duration: "1 min",
+		questionCount: 3,
 		negativeMarking: "-0.25/wrong",
 		candidates: "10,000",
 		questionSets: "3",
 		examSlots: "3",
+		questionTypes: ["Multiple Choice", "Personality", "Essay"],
+		questions: [
+			{
+				id: '1',
+				text: 'Q1. Which personality trait is most associated with leadership readiness?',
+				type: 'multiple-choice',
+				options: [
+					{ id: 'a', text: 'Empathy' },
+					{ id: 'b', text: 'Resilience' },
+					{ id: 'c', text: 'Introversion' },
+					{ id: 'd', text: 'Impulsiveness' }
+				]
+			},
+			{
+				id: '2',
+				text: 'Q2. How would you describe your reaction to unexpected feedback?',
+				type: 'rich-text'
+			},
+			{
+				id: '3',
+				text: 'Q3. Which of the following is an example of strong analytical reasoning?',
+				type: 'multiple-choice',
+				options: [
+					{ id: 'a', text: 'Guessing the outcome' },
+					{ id: 'b', text: 'Using data to support a conclusion' },
+					{ id: 'c', text: 'Relying on intuition alone' },
+					{ id: 'd', text: 'Following routine steps blindly' }
+				]
+			}
+		]
 	},
 	{
 		id: 2,
 		title: "Technical Assessment for Software Engineers",
 		duration: "45 min",
-		questionCount: 30,
+		questionCount: 2,
 		negativeMarking: "-0.33/wrong",
 		candidates: "Not Set",
 		questionSets: "Not Set",
 		examSlots: "Not Set",
+		questionTypes: ["Multiple Choice", "Coding", "Essay"],
+		questions: [
+			{
+				id: '1',
+				text: 'Q1. What is the primary benefit of using a typed language like TypeScript?',
+				type: 'multiple-choice',
+				options: [
+					{ id: 'a', text: 'Faster runtime performance' },
+					{ id: 'b', text: 'Improved developer tooling and safety' },
+					{ id: 'c', text: 'Smaller bundle size' },
+					{ id: 'd', text: 'Automatic memory management' }
+				]
+			},
+			{
+				id: '2',
+				text: 'Q2. Explain how you would approach debugging a failing production build.',
+				type: 'rich-text'
+			}
+		]
 	},
 	{
 		id: 3,
 		title: "General Knowledge Test",
 		duration: "25 min",
-		questionCount: 15,
+		questionCount: 2,
 		negativeMarking: "No",
 		candidates: "10,000",
 		questionSets: "3",
 		examSlots: "3",
+		questionTypes: ["Multiple Choice", "Short Answer"],
+		questions: [
+			{
+				id: '1',
+				text: 'Q1. Which country is known as the Land of the Rising Sun?',
+				type: 'multiple-choice',
+				options: [
+					{ id: 'a', text: 'China' },
+					{ id: 'b', text: 'Japan' },
+					{ id: 'c', text: 'South Korea' },
+					{ id: 'd', text: 'Thailand' }
+				]
+			},
+			{
+				id: '2',
+				text: 'Q2. Name one major river that flows through Bangladesh.',
+				type: 'rich-text'
+			}
+		]
 	},
 	{
 		id: 4,
 		title: "Aptitude Test for Graduates",
 		duration: "40 min",
-		questionCount: 25,
+		questionCount: 2,
 		negativeMarking: "-0.25/wrong",
 		candidates: "5,000",
 		questionSets: "2",
 		examSlots: "2",
+		questionTypes: ["Multiple Choice", "Written Response"],
+		questions: [
+			{
+				id: '1',
+				text: 'Q1. What is 15% of 200?',
+				type: 'multiple-choice',
+				options: [
+					{ id: 'a', text: '25' },
+					{ id: 'b', text: '30' },
+					{ id: 'c', text: '35' },
+					{ id: 'd', text: '40' }
+				]
+			},
+			{
+				id: '2',
+				text: 'Q2. Describe the steps you would take to solve a logical reasoning problem under time pressure.',
+				type: 'rich-text'
+			}
+		]
 	},
 ];
 
-export const mockQuestions = [
+export const mockQuestions: Question[] = [
   {
     id: '1',
     text: 'Q1. Which of the following indicators is used to measure market volatility?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Relative Strength Index (RSI)' },
       { id: 'b', text: 'Moving Average Convergence Divergence (MACD)' },
@@ -55,6 +163,7 @@ export const mockQuestions = [
   {
     id: '2',
     text: 'Q2. What does RSI stand for?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Relative Strength Indicator' },
       { id: 'b', text: 'Relative Strength Index' },
@@ -65,6 +174,7 @@ export const mockQuestions = [
   {
     id: '3',
     text: 'Q3. MACD stands for?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Moving Average Convergence Divergence' },
       { id: 'b', text: 'Moving Average Cross Divergence' },
@@ -75,6 +185,7 @@ export const mockQuestions = [
   {
     id: '4',
     text: 'Q4. What is the primary purpose of Fibonacci Retracement?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'To measure volatility' },
       { id: 'b', text: 'To identify potential support and resistance levels' },
@@ -85,6 +196,7 @@ export const mockQuestions = [
   {
     id: '5',
     text: 'Q5. Which indicator is commonly used to identify overbought or oversold conditions?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Bollinger Bands' },
       { id: 'b', text: 'Fibonacci Retracement' },
@@ -95,6 +207,7 @@ export const mockQuestions = [
   {
     id: '6',
     text: 'Q6. Bollinger Bands consist of?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Two moving averages' },
       { id: 'b', text: 'A moving average and two standard deviation bands' },
@@ -105,6 +218,7 @@ export const mockQuestions = [
   {
     id: '7',
     text: 'Q7. MACD is calculated as the difference between?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Two simple moving averages' },
       { id: 'b', text: 'Fast and slow exponential moving averages' },
@@ -115,6 +229,7 @@ export const mockQuestions = [
   {
     id: '8',
     text: 'Q8. What is the default period for calculating RSI?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: '10' },
       { id: 'b', text: '14' },
@@ -125,6 +240,7 @@ export const mockQuestions = [
   {
     id: '9',
     text: 'Q9. Fibonacci Retracement levels typically include?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: '10%, 20%, 30%' },
       { id: 'b', text: '23.6%, 38.2%, 50%, 61.8%' },
@@ -135,6 +251,7 @@ export const mockQuestions = [
   {
     id: '10',
     text: 'Q10. Which of the following is a momentum oscillator?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Bollinger Bands' },
       { id: 'b', text: 'Fibonacci Retracement' },
@@ -145,6 +262,7 @@ export const mockQuestions = [
   {
     id: '11',
     text: 'Q11. Bollinger Bands were developed by?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'John Bollinger' },
       { id: 'b', text: 'Gerald Appel' },
@@ -155,6 +273,7 @@ export const mockQuestions = [
   {
     id: '12',
     text: 'Q12. The MACD signal line is typically a?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Simple moving average' },
       { id: 'b', text: '9-period exponential moving average of MACD' },
@@ -165,6 +284,7 @@ export const mockQuestions = [
   {
     id: '13',
     text: 'Q13. RSI values range from?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: '-100 to 100' },
       { id: 'b', text: '0 to 100' },
@@ -175,6 +295,7 @@ export const mockQuestions = [
   {
     id: '14',
     text: 'Q14. The Fibonacci sequence is used in technical analysis for?',
+    type: 'multiple-choice',
     options: [
       { id: 'a', text: 'Calculating moving averages' },
       { id: 'b', text: 'Identifying retracement levels' },

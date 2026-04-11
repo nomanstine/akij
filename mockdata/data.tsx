@@ -1,9 +1,4 @@
-export interface Question {
-  id: string;
-  text: string;
-  type?: 'multiple-choice' | 'rich-text';
-  options?: { id: string; text: string }[];
-}
+import { QuestionOption, Question } from '@/lib/schemas';
 
 export interface Test {
   id: number;
@@ -33,28 +28,32 @@ export const tests: Test[] = [
 			{
 				id: '1',
 				text: 'Q1. Which personality trait is most associated with leadership readiness?',
-				type: 'multiple-choice',
+				type: 'radio',
+				points: 1,
 				options: [
-					{ id: 'a', text: 'Empathy' },
-					{ id: 'b', text: 'Resilience' },
-					{ id: 'c', text: 'Introversion' },
-					{ id: 'd', text: 'Impulsiveness' }
+					{ id: 'a', text: 'Empathy', isCorrect: false },
+					{ id: 'b', text: 'Resilience', isCorrect: true },
+					{ id: 'c', text: 'Introversion', isCorrect: false },
+					{ id: 'd', text: 'Impulsiveness', isCorrect: false }
 				]
 			},
 			{
 				id: '2',
 				text: 'Q2. How would you describe your reaction to unexpected feedback?',
-				type: 'rich-text'
+				type: 'text',
+				points: 5,
+				correctAnswer: "Ideal keywords: Receptive, Adaptive, Professional"
 			},
 			{
 				id: '3',
 				text: 'Q3. Which of the following is an example of strong analytical reasoning?',
-				type: 'multiple-choice',
+				type: 'checkbox',
+				points: 2,
 				options: [
-					{ id: 'a', text: 'Guessing the outcome' },
-					{ id: 'b', text: 'Using data to support a conclusion' },
-					{ id: 'c', text: 'Relying on intuition alone' },
-					{ id: 'd', text: 'Following routine steps blindly' }
+					{ id: 'a', text: 'Guessing the outcome', isCorrect: false },
+					{ id: 'b', text: 'Using data to support a conclusion', isCorrect: true },
+					{ id: 'c', text: 'Evaluating different patterns', isCorrect: true },
+					{ id: 'd', text: 'Following routine steps blindly', isCorrect: false }
 				]
 			}
 		]

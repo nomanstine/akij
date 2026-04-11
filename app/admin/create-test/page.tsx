@@ -1,59 +1,28 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { QuestionItem } from "@/components/admin";
-
-interface QuestionOption {
-  id: string;
-  text: string;
-  isCorrect?: boolean;
-}
-
-interface Question {
-  id: string;
-  text: string;
-  type: 'mcq' | 'text';
-  points: number;
-  options?: QuestionOption[];
-  correctAnswer?: string;
-}
+import { QuestionItem, AddQuestionModal } from "@/components/admin";
+import { tests } from "@/mockdata/data";
+import { Question, TestBasicInfoSchema, TestBasicInfo } from "@/lib/schemas";
+import { z } from "zod";
 
 export default function CreateTestPage() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<'basic' | 'questions'>('basic');
-  const [questions, setQuestions] = useState<Question[]>([
-    {
-      id: '1',
-      text: 'What is the Capital of Bangladesh?',
-      type: 'mcq',
-      points: 1,
-      options: [
-        { id: 'a', text: 'Dhaka', isCorrect: true },
-        { id: 'b', text: 'Chattogram', isCorrect: false },
-        { id: 'c', text: 'Rajshahi', isCorrect: false },
-        { id: 'd', text: 'Barishal', isCorrect: false },
-      ],
-    },
-    {
-      id: '2',
-      text: 'What is the Capital of Bangladesh?',
-      type: 'mcq',
-      points: 1,
-      options: [
-        { id: 'a', text: 'Dhaka', isCorrect: true },
-        { id: 'b', text: 'Chattogram', isCorrect: false },
-        { id: 'c', text: 'Rajshahi', isCorrect: false },
-        { id: 'd', text: 'Barishal', isCorrect: false },
-      ],
-    },
-    {
-      id: '3',
-      text: 'Write a brief of your capital city',
-      type: 'text',
-      points: 5,
-      correctAnswer: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum tellus elit sed risus. Maecenas eget condimentum velit, sit amet feugiat lectus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent auctor purus luctus enim egestas, ac scelerisque ante pulvinar. Donec ut rhoncus ex. Suspendisse ac rhoncus nisl, eu tempor urna. Curabitur vel bibendum lorem. Morbi convallis convallis diam sit amet lacinia. Aliquam in elementum tellus.',
-    },
-  ]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [basicInfo, setBasicInfo] = useState<Partial<TestBasicInfo>>({});
+  const [basicInfoErrors, setBasicInfoErrors] = useState<Record<string, string>>({});
+  
+  const [questions, setQuestions] = useState<Question[]>(
+    tests[0].questions.map((q) => ({
+      ...q,
+      points: q.points ?? 1,
+      type: (q.type === 'multiple-choice' ? 'radio' : (q.type === 'rich-text' ? 'text' : q.type)) as Question['type'],
+      options: q.options?.map((opt) => ({ ...opt, isCorrect: opt.isCorrect || false })),
+    }))
+  );
 
   const handleEditQuestion = (questionId: string) => {
     // TODO: Implement edit functionality
@@ -65,8 +34,29 @@ export default function CreateTestPage() {
   };
 
   const handleAddQuestion = () => {
-    // TODO: Implement add question modal/form
-    console.log('Add new question');
+    setIsAddModalOpen(true);
+  };
+
+  const handleSaveNewQuestion = (newQuestion: Question) => {
+    setQuestions([...questions, newQuestion]);
+    setIsAddModalOpen(false);
+  };
+
+  const handleSaveBasicInfo = () => {
+    const result = TestBasicInfoSchema.safeParse(basicInfo);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        if (err.path[0]) {
+          errors[err.path[0].toString()] = err.message;
+        }
+      });
+      setBasicInfoErrors(errors);
+      return;
+    }
+    setBasicInfoErrors({});
+    setCurrentStep('questions');
+    setIsAddModalOpen(true);
   };
 
   return (
@@ -76,7 +66,7 @@ export default function CreateTestPage() {
         <Card className="mb-6 p-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-gray-900">Manage Online Test</h1>
-            <Button variant="outline">Back to Dashboard</Button>
+            <Button variant="outline" onClick={() => router.push('/admin')}>Back to Dashboard</Button>
           </div>
           <div className="mt-6 flex items-center space-x-4">
             <button
@@ -119,9 +109,12 @@ export default function CreateTestPage() {
                   </label>
                   <input
                     type="text"
+                    value={basicInfo.name || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="Enter test name"
                   />
+                  {basicInfoErrors.name && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.name}</p>}
                 </div>
 
                 <div>
@@ -130,9 +123,12 @@ export default function CreateTestPage() {
                   </label>
                   <input
                     type="text"
+                    value={basicInfo.description || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, description: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="Enter description"
                   />
+                  {basicInfoErrors.description && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.description}</p>}
                 </div>
               </div>
 
@@ -145,6 +141,8 @@ export default function CreateTestPage() {
                   <div className="relative">
                     <input
                       type="text"
+                      value={basicInfo.category || ''}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, category: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Select category"
                     />
@@ -154,15 +152,18 @@ export default function CreateTestPage() {
                       </svg>
                     </div>
                   </div>
+                  {basicInfoErrors.category && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.category}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Duration <span className="text-red-500">*</span>
+                    Duration (minutes) <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
+                      type="number"
+                      value={basicInfo.duration || ''}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, duration: parseInt(e.target.value, 10) || 0 })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Enter duration"
                     />
@@ -172,6 +173,7 @@ export default function CreateTestPage() {
                       </svg>
                     </div>
                   </div>
+                  {basicInfoErrors.duration && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.duration}</p>}
                 </div>
               </div>
 
@@ -183,7 +185,9 @@ export default function CreateTestPage() {
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
+                      type="datetime-local"
+                      value={basicInfo.startTime || ''}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, startTime: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Select start time"
                     />
@@ -193,6 +197,7 @@ export default function CreateTestPage() {
                       </svg>
                     </div>
                   </div>
+                  {basicInfoErrors.startTime && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.startTime}</p>}
                 </div>
 
                 <div>
@@ -201,7 +206,9 @@ export default function CreateTestPage() {
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
+                      type="datetime-local"
+                      value={basicInfo.endTime || ''}
+                      onChange={(e) => setBasicInfo({ ...basicInfo, endTime: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                       placeholder="Select end time"
                     />
@@ -211,6 +218,7 @@ export default function CreateTestPage() {
                       </svg>
                     </div>
                   </div>
+                  {basicInfoErrors.endTime && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.endTime}</p>}
                 </div>
               </div>
 
@@ -222,9 +230,12 @@ export default function CreateTestPage() {
                   </label>
                   <input
                     type="number"
+                    value={basicInfo.totalQuestions || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, totalQuestions: parseInt(e.target.value, 10) || 0 })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="Enter total questions"
                   />
+                  {basicInfoErrors.totalQuestions && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.totalQuestions}</p>}
                 </div>
               </div>
             </div>
@@ -232,17 +243,14 @@ export default function CreateTestPage() {
         ) : (
           /* Questions Management */
           <div className="space-y-6">
-            {/* Questions Header */}
-            <Card className="p-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900">Questions Sets</h2>
-                <Button
-                  onClick={handleAddQuestion}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300"
-                >
-                  Add Question
-                </Button>
-              </div>
+            {/* Add Question Button */}
+            <Card className="p-8">
+              <Button
+                onClick={handleAddQuestion}
+                className="button-primary w-full h-14 font-bold text-lg"
+              >
+                Add Question
+              </Button>
             </Card>
 
             {/* Questions List */}
@@ -261,7 +269,7 @@ export default function CreateTestPage() {
             {/* Save Button */}
             <Card className="p-6">
               <div className="flex justify-center">
-                <Button className="w-full max-w-md h-14 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-lg">
+                <Button className="button-primary w-full max-w-md h-14 font-bold text-lg">
                   Save
                 </Button>
               </div>
@@ -277,15 +285,23 @@ export default function CreateTestPage() {
                 Cancel
               </Button>
               <Button
-                onClick={() => setCurrentStep('questions')}
+                onClick={handleSaveBasicInfo}
                 size="lg"
-                className="w-48 h-10 bg-violet-600 hover:bg-violet-700 text-white font-semibold"
+                className="button-primary w-48 h-10 font-bold"
               >
                 Save & Continue
               </Button>
             </div>
           </Card>
         )}
+
+        {/* Modal for adding questions */}
+        <AddQuestionModal 
+          isOpen={isAddModalOpen} 
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={handleSaveNewQuestion}
+          questionNumber={questions.length + 1}
+        />
       </div>
     </div>
   );

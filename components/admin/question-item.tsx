@@ -1,21 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
-interface QuestionOption {
-  id: string;
-  text: string;
-  isCorrect?: boolean;
-}
-
-interface Question {
-  id: string;
-  text: string;
-  type: 'mcq' | 'text';
-  points: number;
-  options?: QuestionOption[];
-  correctAnswer?: string;
-}
+import { Question } from '@/lib/schemas';
 
 interface QuestionItemProps {
   question: Question;
@@ -59,7 +45,7 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
           </h3>
 
           {/* Options for MCQ */}
-          {question.type === 'mcq' && question.options && (
+          {(question.type === 'mcq' || question.type === 'radio' || question.type === 'checkbox' || question.type === 'multiple-choice') && question.options && (
             <div className="space-y-3">
               {question.options.map((option, index) => (
                 <div
@@ -68,17 +54,21 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
                     option.isCorrect ? 'bg-gray-100 border-gray-200' : 'bg-gray-50 border-gray-200'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-gray-700 font-medium">
-                      {String.fromCharCode(65 + index)}. {option.text}
-                    </span>
-                    {option.isCorrect && (
-                      <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    )}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      {option.isCorrect ? (
+                        <div className="w-5 h-5 rounded-full bg-green-500 border border-green-500 flex items-center justify-center shrink-0">
+                          <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      ) : (
+                        <div className="w-5 h-5 rounded-full border border-gray-300 shrink-0"></div>
+                      )}
+                      <span className="text-gray-700 font-medium">
+                        {String.fromCharCode(65 + index)}. {option.text}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -86,9 +76,9 @@ export const QuestionItem: React.FC<QuestionItemProps> = ({
           )}
 
           {/* Text Answer */}
-          {question.type === 'text' && question.correctAnswer && (
+          {(question.type === 'text' || question.type === 'rich-text') && (
             <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-              <p className="text-gray-700">{question.correctAnswer}</p>
+              <p className="text-gray-700">{question.correctAnswer || "No correct answer provided."}</p>
             </div>
           )}
         </div>

@@ -3,8 +3,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const SearchFilter: React.FC = () => {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
       <h1 className="text-2xl font-semibold text-slate-700">Online Tests</h1>
@@ -24,7 +27,10 @@ const SearchFilter: React.FC = () => {
             <Search className="size-4" strokeWidth={2} />
           </button>
         </div>
-        <Button className="h-12 w-full sm:w-48 whitespace-nowrap rounded-xl bg-violet-600 px-8 text-sm font-semibold text-white hover:bg-violet-700">
+        <Button 
+          onClick={() => router.push('/admin/create-test')}
+          className="button-primary h-12 w-full sm:w-48 whitespace-nowrap rounded-xl px-8 text-sm font-bold w-full"
+        >
           Create New Test
         </Button>
       </div>

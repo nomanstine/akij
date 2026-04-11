@@ -38,7 +38,19 @@ export default function CreateTestPage() {
       setEditTestId(parseInt(editId));
       fetchTestForEdit(parseInt(editId));
     } else {
-      fetchDefaultData();
+      // Clear data completely on fresh "Create Test" page instead of mocking existing ones.
+      setBasicInfo({
+        title: "",
+        duration: "",
+        questionCount: 0,
+        negativeMarking: "",
+        candidates: "",
+        questionSets: "",
+        examSlots: "",
+        questionTypes: [],
+      });
+      setQuestions([]);
+      setIsLoading(false);
     }
   }, []);
 
@@ -74,25 +86,8 @@ export default function CreateTestPage() {
   };
 
   const fetchDefaultData = async () => {
-    try {
-      const response = await api.get('/tests');
-      const defaultTest = response.data[0];
-      
-      if (defaultTest && defaultTest.questions) {
-        setQuestions(
-          defaultTest.questions.map((q: any) => ({
-            ...q,
-            points: q.points ?? 1,
-            type: (q.type === 'multiple-choice' ? 'radio' : (q.type === 'rich-text' ? 'text' : q.type)) as Question['type'],
-            options: q.options?.map((opt: any) => ({ ...opt, isCorrect: opt.isCorrect || false })),
-          }))
-        );
-      }
-    } catch (error) {
-      console.error("Failed to fetch test data:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Deprecated mock fetch. Left as a stub. Alternatively, remove completely.
+    setIsLoading(false);
   };
 
   const handleEditQuestion = (questionId: string) => {
@@ -121,6 +116,11 @@ export default function CreateTestPage() {
 
   const handleSubmitTest = async () => {
     try {
+      if (questions.length === 0) {
+        alert("Please add at least one question before saving.");
+        return;
+      }
+
       const testData = {
         ...basicInfo,
         questions: questions.map(q => ({
@@ -133,14 +133,18 @@ export default function CreateTestPage() {
       };
 
       if (isEditMode && editTestId) {
-        await api.put(`/tests/${editTestId}`, testData);
-        alert('Test updated successfully!');
+        const res = await api.put(`/tests/${editTestId}`, testData);
+        if (res.status === 200 || res.status === 201) {
+            alert('Test updated successfully!');
+            router.push('/admin');
+        }
       } else {
-        await api.post('/tests', testData);
-        alert('Test created successfully!');
+        const res = await api.post('/tests', testData);
+        if (res.status === 200 || res.status === 201) {
+            alert('Test created successfully!');
+            router.push('/admin');
+        }
       }
-      
-      router.push('/admin');
     } catch (error) {
       console.error('Failed to save test:', error);
       alert('Failed to save test. Please try again.');
@@ -149,7 +153,12 @@ export default function CreateTestPage() {
 
   const handleSaveBasicInfo = () => {
     try {
-      TestBasicInfoSchema.parse(basicInfo);
+      const infoToValidate = {
+        ...basicInfo,
+        questionTypes: basicInfo.questionTypes || []
+      };
+      
+      TestBasicInfoSchema.parse(infoToValidate);
       setBasicInfoErrors({});
       setCurrentStep('questions');
     } catch (error) {
@@ -326,8 +335,8 @@ export default function CreateTestPage() {
                   </label>
                   <input
                     type="text"
-                    value={Array.isArray(basicInfo.questionTypes) ? basicInfo.questionTypes.join(', ') : ''}
-                    onChange={(e) => setBasicInfo({ ...basicInfo, questionTypes: e.target.value.split(',').map(s => s.trim()) })}
+                    value={basicInfo.questionTypes?.join(', ') || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, questionTypes: e.target.value.split(',').map(s => s.trim()).filter(s => s) })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
                     placeholder="e.g., Multiple Choice, Essay"
                   />

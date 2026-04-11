@@ -24,13 +24,16 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
   onSave,
   questionNumber
 }) => {
-  const [questionType, setQuestionType] = useState<'checkbox' | 'radio' | 'text'>('checkbox');
+  const [questionType, setQuestionType] = useState<'checkbox' | 'radio' | 'text'>('radio');
+  const [questionText, setQuestionText] = useState('');
   const [score, setScore] = useState(1);
   const [options, setOptions] = useState([
     { id: '1', text: '', isCorrect: false },
     { id: '2', text: '', isCorrect: false },
     { id: '3', text: '', isCorrect: false },
   ]);
+
+  const [expectedAnswer, setExpectedAnswer] = useState('');
 
   if (!isOpen) return null;
 
@@ -50,6 +53,60 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
       setOptions(options.map(o => ({ ...o, isCorrect: o.id === id })));
     } else {
       setOptions(options.map(o => (o.id === id ? { ...o, isCorrect } : o)));
+    }
+  };
+
+  const handleOptionTextChange = (id: string, text: string) => {
+    setOptions(options.map(o => (o.id === id ? { ...o, text } : o)));
+  };
+
+  const handleSave = () => {
+    if (!questionText.trim()) {
+      alert("Question text is required");
+      return false;
+    }
+
+    if (questionType !== 'text') {
+      const emptyOption = options.find(o => !o.text.trim());
+      if (emptyOption) {
+        alert("All options must have text");
+        return false;
+      }
+      const correctOption = options.find(o => o.isCorrect);
+      if (!correctOption) {
+        alert("Please select at least one correct answer");
+        return false;
+      }
+    }
+
+    const newQuestion = {
+      id: Date.now().toString(),
+      text: questionText,
+      type: questionType === 'text' ? 'text' : ('radio' as const),
+      points: score,
+      options: questionType !== 'text' ? options : undefined,
+      correctAnswer: questionType === 'text' ? expectedAnswer : undefined
+    };
+    
+    // Quick zod validation
+    const result = QuestionSchema.safeParse(newQuestion);
+    if (result.success) {
+      onSave(result.data);
+      // Reset state for next time
+      setQuestionText('');
+      setExpectedAnswer('');
+      setOptions([
+        { id: '1', text: '', isCorrect: false },
+        { id: '2', text: '', isCorrect: false },
+        { id: '3', text: '', isCorrect: false },
+      ]);
+      setQuestionType('radio');
+      setScore(1);
+      return true;
+    } else {
+      console.error("Validation failed:", result.error);
+      alert("Validation failed for question data.");
+      return false;
     }
   };
 
@@ -108,7 +165,11 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
           </div>
 
           {/* Question Text Area */}
-          <RichTextEditorMock placeholder="Type your question here..." />
+          <RichTextEditorMock 
+            placeholder="Type your question here..." 
+            value={questionText} 
+            onChange={(val) => setQuestionText(val)} 
+          />
 
           {/* Options */}
           {questionType !== 'text' ? (
@@ -150,7 +211,11 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
                         <Trash2 className="size-5" />
                       </button>
                     </div>
-                    <RichTextEditorMock placeholder={`Option ${letterArray[index]}`} />
+                    <RichTextEditorMock 
+                      placeholder={`Option ${letterArray[index]}`}
+                      value={option.text}
+                      onChange={(val) => handleOptionTextChange(option.id, val)}
+                    />
                   </div>
                 ))}
               </div>
@@ -168,7 +233,11 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
           ) : (
             <div className="mt-4">
               <h3 className="text-sm font-semibold text-slate-800 mb-2">Expected Ideal Answer (Optional)</h3>
-              <RichTextEditorMock placeholder="Type the expected answer or keywords here to assist grading..." />
+              <RichTextEditorMock 
+                placeholder="Type the expected answer or keywords here to assist grading..." 
+                value={expectedAnswer}
+                onChange={(val) => setExpectedAnswer(val)}
+              />
             </div>
           )}
         </div>
@@ -176,46 +245,9 @@ export const AddQuestionModal: React.FC<AddQuestionModalProps> = ({
         {/* Footer */}
         <div className="border-t border-slate-100 p-6 flex justify-end gap-4 bg-white rounded-b-2xl">
           <Button 
-            variant="outline" 
-            onClick={() => {
-              const newQuestion = {
-                id: Date.now().toString(),
-                text: 'New Question', // In reality, this would come from a text input
-                type: questionType === 'text' ? 'text' : ('mcq' as const),
-                points: score,
-                options: questionType !== 'text' ? options : undefined
-              };
-              
-              const result = QuestionSchema.safeParse(newQuestion);
-              if (result.success) {
-                onSave(result.data);
-                onClose();
-              } else {
-                console.error("Validation failed:", result.error);
-                onClose();
-              }
-            }}
-            className="border-violet-600 text-violet-600 hover:bg-violet-50 hover:text-violet-700 font-semibold px-8 h-12 rounded-xl"
-          >
-            Save
-          </Button>
-          <Button 
             className="button-primary font-bold px-8 h-12 rounded-xl"
             onClick={() => {
-              const newQuestion = {
-                id: Date.now().toString(),
-                text: 'New Question', // In reality, this would come from a text input
-                type: questionType === 'text' ? 'text' : ('mcq' as const),
-                points: score,
-                options: questionType !== 'text' ? options : undefined
-              };
-              
-              const result = QuestionSchema.safeParse(newQuestion);
-              if (result.success) {
-                onSave(result.data);
-              } else {
-                console.error("Validation failed:", result.error);
-              }
+              handleSave();
             }}
           >
             Save & Add More

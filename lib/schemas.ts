@@ -22,13 +22,14 @@ export type QuestionType = z.infer<typeof QuestionTypeSchema>;
 export type Question = z.infer<typeof QuestionSchema>;
 
 export const TestBasicInfoSchema = z.object({
-  name: z.string().min(1, "Test name is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.string().min(1, "Category is required"),
-  duration: z.number().min(1, "Duration must be greater than 0"),
-  startTime: z.string().min(1, "Start time is required"),
-  endTime: z.string().min(1, "End time is required"),
-  totalQuestions: z.number().min(1, "Total questions must be greater than 0"),
+  title: z.string().min(1, "Test title is required"),
+  duration: z.string().min(1, "Duration is required"),
+  questionCount: z.number().min(1, "Question count must be greater than 0"),
+  negativeMarking: z.string().min(1, "Negative marking is required"),
+  candidates: z.string().min(1, "Candidates is required"),
+  questionSets: z.string().min(1, "Question sets is required"),
+  examSlots: z.string().min(1, "Exam slots is required"),
+  questionTypes: z.array(z.string()).min(1, "At least one question type is required"),
 });
 
 export type TestBasicInfo = z.infer<typeof TestBasicInfoSchema>;

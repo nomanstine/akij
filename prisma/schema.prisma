@@ -1,0 +1,48 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Test {
+  id              Int        @id @default(autoincrement())
+  title           String
+  duration        String
+  questionCount   Int
+  negativeMarking String
+  candidates      String
+  questionSets    String
+  examSlots       String
+  questionTypes   String     // Stored as JSON string
+  questions       Question[]
+}
+
+model Question {
+  id            String           @id @default(cuid())
+  testId        Int?
+  test          Test?            @relation(fields: [testId], references: [id], onDelete: Cascade)
+  text          String
+  type          String
+  points        Float            @default(1)
+  correctAnswer String?
+  options       QuestionOption[]
+}
+
+model QuestionOption {
+  id         String    @id @default(cuid())
+  questionId String
+  question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  isCorrect  Boolean   @default(false)
+}
+
+model User {
+  id       String  @id @default(cuid())
+  name     String?
+  email    String? @unique
+  password String?
+  role     String  @default("user") // "admin" or "user"
+}

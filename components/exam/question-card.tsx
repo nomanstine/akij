@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Timer } from './timer';
 import { Option } from './option';
@@ -12,6 +12,7 @@ interface QuestionCardProps {
   totalQuestions: number;
   timeLeft: number;
   selectedOption?: string | null;
+  richTextValue?: string;
   onAnswerSelect?: (questionId: string, optionId: string) => void;
   onTimeUp?: () => void;
   className?: string;
@@ -23,18 +24,16 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   totalQuestions,
   timeLeft,
   selectedOption,
+  richTextValue,
   onAnswerSelect,
   onTimeUp,
   className
 }) => {
-  const [richTextAnswer, setRichTextAnswer] = useState('');
-
   const handleOptionSelect = (optionId: string) => {
     onAnswerSelect?.(question.id, optionId);
   };
 
   const handleRichTextChange = (value: string) => {
-    setRichTextAnswer(value);
     onAnswerSelect?.(question.id, value);
   };
 
@@ -46,7 +45,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <h2 className="text-xl font-medium text-gray-700">
             Question ({currentQuestion}/{totalQuestions})
           </h2>
-          <Timer initialTime={timeLeft} onTimeUp={onTimeUp} />
+          <Timer initialTime={timeLeft} />
         </div>
       </Card>
 
@@ -57,27 +56,30 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             {question.text}
           </h3>
 
-          {question.type === 'rich-text' ? (
-            <div className="space-y-4">
-              <RichTextEditorMock 
-                placeholder="Type your answer here..."
-                value={selectedOption || richTextAnswer}
-                onChange={handleRichTextChange}
-              />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {question.options?.map((option) => (
-                <Option
-                  key={option.id}
-                  id={option.id}
-                  text={option.text}
-                  isSelected={selectedOption === option.id}
-                  onSelect={handleOptionSelect}
+          {(() => {
+            if (!question) return <div>Loading question...</div>;
+            return (question.type === 'rich-text' || question.type === 'text') ? (
+              <div className="space-y-4">
+                <RichTextEditorMock 
+                  placeholder="Type your answer here..."
+                  value={richTextValue || ''}
+                  onChange={handleRichTextChange}
                 />
-              ))}
-            </div>
-          )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {question.options?.map((option) => (
+                  <Option
+                    key={option.id}
+                    id={option.id}
+                    text={option.text}
+                    isSelected={selectedOption === option.id}
+                    onSelect={handleOptionSelect}
+                  />
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </Card>
     </div>

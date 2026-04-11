@@ -3,6 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { signIn } from 'next-auth/react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Label } from './ui/label';
@@ -14,44 +18,76 @@ import {
 } from './ui/dropdown-menu';
 import { ChevronDown } from 'lucide-react';
 
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginValues = z.infer<typeof loginSchema>;
+
 interface LoginFormProps {
   onSubmit?: (email: string, password: string) => void;
-  isLoading?: boolean;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
-  onSubmit,
-  isLoading = false
+  onSubmit, 
 }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setValue,
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema as any) as any,
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-    // Basic validation
-    if (!email || !password) {
-      return;
-    }
-
-    // Call custom onSubmit if provided
+  const onFormSubmit = async (data: LoginValues) => {
+    setError(null);
     if (onSubmit) {
-      onSubmit(email, password);
+      onSubmit(data.email, data.password);
     }
 
-    // Redirect to dashboard
-    router.push('/dashboard');
+    try {
+      const response = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (response?.error) {
+        setError('Invalid email or password');
+      } else {
+        router.refresh();
+        router.push(data.email === 'admin@demo.com' ? '/admin' : '/dashboard');
+      }
+    } catch (err) {
+      setError('An error occurred during sign in');
+    }
+  };
+
+  const setDemoCredentials = (role: 'admin' | 'user') => {
+    if (role === 'admin') {
+      setValue('email', 'admin@demo.com');
+      setValue('password', 'admin123');
+    } else {
+      setValue('email', 'user@demo.com');
+      setValue('password', 'user123');
+    }
   };
 
   return (
     <div className="auth-container flex flex-col gap-6 px-4 py-12">
-      {/* Sign In Heading */}
       <h1 className="auth-heading">
         Sign In
       </h1>
 
-      {/* Form Container */}
       <Card className="auth-card flex flex-col gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -60,16 +96,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-full min-w-[var(--radix-dropdown-menu-trigger-width)]">
-            <DropdownMenuItem onClick={() => router.push('/dashboard')}>
-              Demo Candidate
+            <DropdownMenuItem onClick={() => setDemoCredentials('user')}>
+              Candidate
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push('/admin')}>
-              Demo Employer
+            <DropdownMenuItem onClick={() => setDemoCredentials('admin')}>
+              Employer
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <form onSubmit={handleSubmit} className="form-stack">
-          {/* Email Input Field */}
+
+        <form onSubmit={handleSubmit(onFormSubmit)} className="form-stack">
+          {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
+
           <div className="form-field">
             <Label htmlFor="email" className="form-label">
               Email
@@ -77,15 +115,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <input
               id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               className="form-input focus:border-transparent focus:ring-2 focus:ring-[var(--primary)]"
-              required
+              {...register('email')}
             />
+            {errors.email && (
+              <span className="text-sm text-red-500">{errors.email.message}</span>
+            )}
           </div>
 
-          {/* Password Input Field */}
           <div className="form-field">
             <Label htmlFor="password" className="form-label">
               Password
@@ -93,12 +131,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <input
               id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               className="form-input focus:border-transparent focus:ring-2 focus:ring-[var(--primary)]"
-              required
+              {...register('password')}
             />
+            {errors.password && (
+              <span className="text-sm text-red-500">{errors.password.message}</span>
+            )}
           </div>
 
           <div className="flex justify-end">
@@ -111,10 +150,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <div className="flex flex-col gap-3">
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="button-primary font-bold w-full"
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              {isSubmitting ? 'Signing In...' : 'Sign In'}
             </Button>
           </div>
         </form>

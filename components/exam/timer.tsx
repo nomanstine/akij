@@ -7,22 +7,7 @@ interface TimerProps {
   className?: string;
 }
 
-export const Timer: React.FC<TimerProps> = ({ initialTime, onTimeUp, className }) => {
-  const [timeLeft, setTimeLeft] = useState(initialTime);
-
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      onTimeUp?.();
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft, onTimeUp]);
-
+export const Timer: React.FC<TimerProps> = ({ initialTime, className }) => {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -32,7 +17,7 @@ export const Timer: React.FC<TimerProps> = ({ initialTime, onTimeUp, className }
   return (
     <div className={cn("bg-gray-100 px-16 py-4 rounded-lg", className)}>
       <span className="text-xl font-semibold text-gray-700">
-        {formatTime(timeLeft)} left
+        {formatTime(initialTime)} left
       </span>
     </div>
   );

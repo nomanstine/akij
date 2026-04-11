@@ -3,6 +3,7 @@
 import { UserCircle2, LogOut, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { Logo } from "./logo";
 import {
   DropdownMenu,
@@ -19,7 +20,7 @@ interface User {
 }
 
 interface HeaderProps {
-  isAuthenticated: boolean;
+  isAuthenticated?: boolean;
   user?: User;
 }
 
@@ -48,8 +49,8 @@ function Navbar() {
 function UserDropdown({ user }: UserDropdownProps) {
   const router = useRouter();
 
-  const handleLogout = () => {
-    router.push("/");
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' });
   };
 
   return (
@@ -83,7 +84,15 @@ function UserDropdown({ user }: UserDropdownProps) {
   );
 }
 
-export function Header({ isAuthenticated, user }: HeaderProps) {
+export function Header({ isAuthenticated: defaultIsAuthenticated, user: defaultUser }: HeaderProps) {
+  const { data: session } = useSession();
+  const isAuthenticated = defaultIsAuthenticated ?? !!session;
+  
+  const user = session?.user ? {
+    name: session.user.name || "User",
+    refId: (session.user as any).role === "admin" ? "ADMIN" : session.user.email || "N/A"
+  } : defaultUser;
+
   return (
     <header className="border-b border-slate-200 bg-white shadow-lg">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">

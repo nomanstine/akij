@@ -6,13 +6,17 @@ import { Card } from '@/components/ui/card';
 import { Users, FileText, Clock3 } from 'lucide-react';
 
 interface TestCardProps {
+  id: number;
   title: string;
   candidates: string;
   questionSets: string;
   examSlots: string;
+  onViewDetails: (id: number) => void;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
-const TestCard: React.FC<TestCardProps> = ({ title, candidates, questionSets, examSlots }) => {
+const TestCard: React.FC<TestCardProps> = ({ id, title, candidates, questionSets, examSlots, onViewDetails, onEdit, onDelete }) => {
   return (
     <Card className="gap-0 rounded-2xl border border-slate-200 bg-white px-6 py-6 text-slate-700 shadow-none">
       <h2 className="text-xl leading-relaxed font-semibold text-slate-700">
@@ -43,14 +47,23 @@ const TestCard: React.FC<TestCardProps> = ({ title, candidates, questionSets, ex
         <Button
           variant="outline"
           className="h-11 min-w-[20%] rounded-xl border-violet-600 px-6 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
+          onClick={() => onViewDetails(id)}
         >
           View Details
         </Button>
         <Button
           variant="outline"
           className="h-11 min-w-[20%] rounded-xl border-violet-600 px-6 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
+          onClick={() => onEdit(id)}
         >
           Edit
+        </Button>
+        <Button
+          variant="outline"
+          className="h-11 min-w-[20%] rounded-xl border-red-600 px-6 text-sm font-semibold text-red-600 hover:bg-red-600/5"
+          onClick={() => onDelete(id)}
+        >
+          Delete
         </Button>
       </div>
     </Card>

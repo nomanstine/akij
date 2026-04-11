@@ -1,32 +1,109 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { QuestionItem, AddQuestionModal } from "@/components/admin";
-import { tests } from "@/mockdata/data";
+import api from "@/lib/api";
 import { Question, TestBasicInfoSchema, TestBasicInfo } from "@/lib/schemas";
 import { z } from "zod";
+import { useTestStore } from "@/store/testStore";
 
 export default function CreateTestPage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState<'basic' | 'questions'>('basic');
+  const {
+    currentStep, setCurrentStep,
+    basicInfo, setBasicInfo,
+    questions, setQuestions,
+    isEditMode, setIsEditMode,
+    editTestId, setEditTestId,
+    reset
+  } = useTestStore();
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [basicInfo, setBasicInfo] = useState<Partial<TestBasicInfo>>({});
   const [basicInfoErrors, setBasicInfoErrors] = useState<Record<string, string>>({});
-  
-  const [questions, setQuestions] = useState<Question[]>(
-    tests[0].questions.map((q) => ({
-      ...q,
-      points: q.points ?? 1,
-      type: (q.type === 'multiple-choice' ? 'radio' : (q.type === 'rich-text' ? 'text' : q.type)) as Question['type'],
-      options: q.options?.map((opt) => ({ ...opt, isCorrect: opt.isCorrect || false })),
-    }))
-  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Reset store on component unmount
+    return () => reset();
+  }, [reset]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    
+    if (editId) {
+      setIsEditMode(true);
+      setEditTestId(parseInt(editId));
+      fetchTestForEdit(parseInt(editId));
+    } else {
+      fetchDefaultData();
+    }
+  }, []);
+
+  const fetchTestForEdit = async (testId: number) => {
+    try {
+      const response = await api.get(`/tests/${testId}`);
+      const test = response.data;
+      
+      setBasicInfo({
+        title: test.title,
+        duration: test.duration,
+        questionCount: test.questionCount,
+        negativeMarking: test.negativeMarking,
+        candidates: test.candidates,
+        questionSets: test.questionSets,
+        examSlots: test.examSlots,
+        questionTypes: test.questionTypes,
+      });
+      
+      setQuestions(
+        test.questions.map((q: any) => ({
+          ...q,
+          points: q.points ?? 1,
+          type: (q.type === 'multiple-choice' ? 'radio' : (q.type === 'rich-text' ? 'text' : q.type)) as Question['type'],
+          options: q.options?.map((opt: any) => ({ ...opt, isCorrect: opt.isCorrect || false })),
+        }))
+      );
+    } catch (error) {
+      console.error("Failed to fetch test for edit:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchDefaultData = async () => {
+    try {
+      const response = await api.get('/tests');
+      const defaultTest = response.data[0];
+      
+      if (defaultTest && defaultTest.questions) {
+        setQuestions(
+          defaultTest.questions.map((q: any) => ({
+            ...q,
+            points: q.points ?? 1,
+            type: (q.type === 'multiple-choice' ? 'radio' : (q.type === 'rich-text' ? 'text' : q.type)) as Question['type'],
+            options: q.options?.map((opt: any) => ({ ...opt, isCorrect: opt.isCorrect || false })),
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to fetch test data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleEditQuestion = (questionId: string) => {
-    // TODO: Implement edit functionality
+    // TODO: Implement edit functionality - open modal with existing question data
     console.log('Edit question:', questionId);
+    const question = questions.find(q => q.id === questionId);
+    if (question) {
+      // For now, just remove and re-add. In future, open edit modal
+      handleRemoveQuestion(questionId);
+      // You could open the add modal with pre-filled data here
+    }
   };
 
   const handleRemoveQuestion = (questionId: string) => {
@@ -42,22 +119,55 @@ export default function CreateTestPage() {
     setIsAddModalOpen(false);
   };
 
-  const handleSaveBasicInfo = () => {
-    const result = TestBasicInfoSchema.safeParse(basicInfo);
-    if (!result.success) {
-      const errors: Record<string, string> = {};
-      result.error.issues.forEach((err) => {
-        if (err.path[0]) {
-          errors[err.path[0].toString()] = err.message;
-        }
-      });
-      setBasicInfoErrors(errors);
-      return;
+  const handleSubmitTest = async () => {
+    try {
+      const testData = {
+        ...basicInfo,
+        questions: questions.map(q => ({
+          text: q.text,
+          type: q.type === 'radio' ? 'multiple-choice' : q.type === 'text' ? 'rich-text' : q.type,
+          points: q.points,
+          correctAnswer: q.correctAnswer,
+          options: q.options
+        }))
+      };
+
+      if (isEditMode && editTestId) {
+        await api.put(`/tests/${editTestId}`, testData);
+        alert('Test updated successfully!');
+      } else {
+        await api.post('/tests', testData);
+        alert('Test created successfully!');
+      }
+      
+      router.push('/admin');
+    } catch (error) {
+      console.error('Failed to save test:', error);
+      alert('Failed to save test. Please try again.');
     }
-    setBasicInfoErrors({});
-    setCurrentStep('questions');
-    setIsAddModalOpen(true);
   };
+
+  const handleSaveBasicInfo = () => {
+    try {
+      TestBasicInfoSchema.parse(basicInfo);
+      setBasicInfoErrors({});
+      setCurrentStep('questions');
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.issues.forEach((err) => {
+          if (err.path.length > 0) {
+            errors[err.path[0] as string] = err.message;
+          }
+        });
+        setBasicInfoErrors(errors);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -101,141 +211,127 @@ export default function CreateTestPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Basic Information</h2>
 
             <div className="space-y-6">
-              {/* Test Name */}
+              {/* Test Title */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Test Name <span className="text-red-500">*</span>
+                    Test Title <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={basicInfo.name || ''}
-                    onChange={(e) => setBasicInfo({ ...basicInfo, name: e.target.value })}
+                    value={basicInfo.title || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, title: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                    placeholder="Enter test name"
+                    placeholder="Enter test title"
                   />
-                  {basicInfoErrors.name && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.name}</p>}
+                  {basicInfoErrors.title && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.title}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description <span className="text-red-500">*</span>
+                    Duration <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={basicInfo.description || ''}
-                    onChange={(e) => setBasicInfo({ ...basicInfo, description: e.target.value })}
+                    value={basicInfo.duration || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, duration: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                    placeholder="Enter description"
+                    placeholder="e.g., 45 min"
                   />
-                  {basicInfoErrors.description && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.description}</p>}
-                </div>
-              </div>
-
-              {/* Category and Duration */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={basicInfo.category || ''}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                      placeholder="Select category"
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </div>
-                  {basicInfoErrors.category && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.category}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Duration (minutes) <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={basicInfo.duration || ''}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, duration: parseInt(e.target.value, 10) || 0 })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                      placeholder="Enter duration"
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
                   {basicInfoErrors.duration && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.duration}</p>}
                 </div>
               </div>
 
-              {/* Start Time and End Time */}
+              {/* Question Count and Negative Marking */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Time <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="datetime-local"
-                      value={basicInfo.startTime || ''}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, startTime: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                      placeholder="Select start time"
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  {basicInfoErrors.startTime && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.startTime}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    End Time <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="datetime-local"
-                      value={basicInfo.endTime || ''}
-                      onChange={(e) => setBasicInfo({ ...basicInfo, endTime: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                      placeholder="Select end time"
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  {basicInfoErrors.endTime && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.endTime}</p>}
-                </div>
-              </div>
-
-              {/* Total Questions */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Total Questions <span className="text-red-500">*</span>
+                    Question Count <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
-                    value={basicInfo.totalQuestions || ''}
-                    onChange={(e) => setBasicInfo({ ...basicInfo, totalQuestions: parseInt(e.target.value, 10) || 0 })}
+                    value={basicInfo.questionCount || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, questionCount: parseInt(e.target.value, 10) || 0 })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
-                    placeholder="Enter total questions"
+                    placeholder="Enter question count"
                   />
-                  {basicInfoErrors.totalQuestions && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.totalQuestions}</p>}
+                  {basicInfoErrors.questionCount && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.questionCount}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Negative Marking <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.negativeMarking || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, negativeMarking: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
+                    placeholder="e.g., -0.25/wrong"
+                  />
+                  {basicInfoErrors.negativeMarking && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.negativeMarking}</p>}
+                </div>
+              </div>
+
+              {/* Candidates and Question Sets */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Candidates <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.candidates || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, candidates: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
+                    placeholder="e.g., 10,000"
+                  />
+                  {basicInfoErrors.candidates && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.candidates}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Question Sets <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.questionSets || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, questionSets: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
+                    placeholder="e.g., 3"
+                  />
+                  {basicInfoErrors.questionSets && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.questionSets}</p>}
+                </div>
+              </div>
+
+              {/* Exam Slots and Question Types */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Exam Slots <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={basicInfo.examSlots || ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, examSlots: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
+                    placeholder="e.g., 3"
+                  />
+                  {basicInfoErrors.examSlots && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.examSlots}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Question Types <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={Array.isArray(basicInfo.questionTypes) ? basicInfo.questionTypes.join(', ') : ''}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, questionTypes: e.target.value.split(',').map(s => s.trim()) })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent"
+                    placeholder="e.g., Multiple Choice, Essay"
+                  />
+                  {basicInfoErrors.questionTypes && <p className="text-red-500 text-xs mt-1">{basicInfoErrors.questionTypes}</p>}
                 </div>
               </div>
             </div>
@@ -269,8 +365,11 @@ export default function CreateTestPage() {
             {/* Save Button */}
             <Card className="p-6">
               <div className="flex justify-center">
-                <Button className="button-primary w-full max-w-md h-14 font-bold text-lg">
-                  Save
+                <Button 
+                  onClick={handleSubmitTest}
+                  className="button-primary w-full max-w-md h-14 font-bold text-lg"
+                >
+                  {isEditMode ? 'Update Test' : 'Save Test'}
                 </Button>
               </div>
             </Card>

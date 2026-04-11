@@ -25,6 +25,10 @@ export async function GET() {
     return NextResponse.json(formattedQuestions);
   } catch (error) {
     console.error("Database fetch error:", error);
+    return NextResponse.json({ error: "Failed to fetch questions" }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();

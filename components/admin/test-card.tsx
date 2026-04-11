@@ -42,13 +42,13 @@ const TestCard: React.FC<TestCardProps> = ({ title, candidates, questionSets, ex
       <div className="mt-6 flex gap-3">
         <Button
           variant="outline"
-          className="h-10 w-28 rounded-xl border-violet-600 px-8 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
+          className="h-11 min-w-[20%] rounded-xl border-violet-600 px-6 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
         >
           View Details
         </Button>
         <Button
           variant="outline"
-          className="h-10 w-28 rounded-xl border-violet-600 px-8 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
+          className="h-11 min-w-[20%] rounded-xl border-violet-600 px-6 text-sm font-semibold text-violet-600 hover:bg-violet-600/5"
         >
           Edit
         </Button>
